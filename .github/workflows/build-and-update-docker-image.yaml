@@ -1,0 +1,70 @@
+name: BuildAndUpload # check name
+
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        description: 'Project name for image prefix'
+        type: string
+        required: true
+      artifact_key: 
+        description: 'Key name for artifact uploaded in prior steps, by default we will look for "service" key'
+        type: string
+        required: false
+        default: 'service'
+      artifact_location: 
+        description: 'Location where the artifact should be downloaded to, by default we will place it in build/'
+        type: string
+        required: false
+        default: 'build/'
+
+    secrets:
+      username:
+        description: 'docker hub user name'
+        required: true
+      password:
+        description: 'docker hub user password'
+        required: true
+    outputs:
+      tag_name:
+        description: 'result image name'
+        value: ${{ jobs.build.outputs.TAG_NAME }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      TAG_NAME: ${{ steps.getImageName.outputs.TAG_NAME }}
+    steps:
+      - uses: actions/checkout@v3 # external action, change to this branch
+      - name: Get image name
+        uses: actions/github-script@v6.1.1
+        id: getImageName
+        with:
+          script: |
+            console.log(process.env.GITHUB_EVENT_NAME, process.env.GITHUB_HEAD_REF, process.env.GITHUB_REF)
+            const imageName = process.env.GITHUB_EVENT_NAME === 'pull_request' ? process.env.GITHUB_HEAD_REF : 'latest'
+            const normalizedImageName = imageName.replace(/\//g,'-').toLowerCase()
+
+            console.info(imageName, normalizedImageName)
+            core.setOutput('TAG_NAME', normalizedImageName)
+      - name: Download Built Code
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{inputs.artifact_key}}
+          path: ${{inputs.artifact_location}}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v2.0.0
+        with:
+          username: ${{secrets.username}}
+          password: ${{secrets.password}}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: registry.paranoids.us/${{inputs.project_name}}:${{steps.getImageName.outputs.TAG_NAME}}
