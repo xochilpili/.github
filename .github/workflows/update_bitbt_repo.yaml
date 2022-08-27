@@ -1,0 +1,30 @@
+name: Update Bitbucket Repo
+
+on:
+  workflow_call:
+    inputs:
+      input_text:
+        description: "Escribe el texto a ser repetido"
+        type: string
+        required: true
+        default: 'Hello world'
+      num_of_repeats:
+        description: 'Número de veces a repetir'
+        type: number
+        required: true
+        default: 1
+    outputs:
+      node_version:
+        description: 'Texto repetido'
+        value: ${{ jobs.setRepeatedText.outputs.REPEATED_TEXT }}
+
+jobs:
+  setRepeatedText:
+    runs-on: ubuntu-latest
+    outputs:
+      NODE_VERSION: ${{ steps.getText.outputs.REPEATED_TEXT }}
+    steps:
+      - name: Executing bash
+        id: getText
+        run: ./.github/scripts/test.sh ${{inputs.input_text}} ${{inputs.num_of_repeats}}
+        shell: bash
