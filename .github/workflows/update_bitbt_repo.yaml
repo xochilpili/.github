@@ -24,8 +24,9 @@ jobs:
     outputs:
       NODE_VERSION: ${{ steps.getText.outputs.REPEATED_TEXT }}
     steps:
+      - name: Discovering path
+        run: pwd
       - name: Executing bash
         id: getText
-        run: ../scripts/test.sh ${{inputs.input_text}} ${{inputs.num_of_repeats}}
+        run: ${GITHUB_WORKSPACE}/scripts/test.sh ${{inputs.input_text}} ${{inputs.num_of_repeats}}
         shell: bash
-        working-dir: inherit
