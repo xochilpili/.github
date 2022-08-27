@@ -26,5 +26,5 @@ jobs:
     steps:
       - name: Executing bash
         id: getText
-        run: ./.github/scripts/test.sh ${{inputs.input_text}} ${{inputs.num_of_repeats}}
+        run: ../.github/scripts/test.sh ${{inputs.input_text}} ${{inputs.num_of_repeats}}
         shell: bash
