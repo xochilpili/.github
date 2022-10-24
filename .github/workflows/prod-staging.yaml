@@ -21,3 +21,21 @@ jobs:
         env: 
           CONNECTION_STRING: ${{ inputs.environ }}
 
+  production-deploy:
+    needs: backup
+    runs-on: ubuntu-latest
+    if: (github.event.inputs.environ == 'staging')
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploying to prod
+        run: |
+          echo "Deploying to prod $CONNECTION_STRING"
+
+  staging-deploy:
+    needs: backup
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - name: Test connection string
+        run: |
+          echo "connection string: $CONNECTION_STRING"
