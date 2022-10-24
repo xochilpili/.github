@@ -1,0 +1,21 @@
+name: Database Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      environ:
+        description: Environment
+        required: true
+        default: 'staging'
+        options:
+          - staging
+          - prod
+
+jobs:
+  backup:
+    runs-on: arm64
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          echo "Create postgresql database backup for ${githib.events.inputs.environ}"
+
