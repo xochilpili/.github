@@ -17,5 +17,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install dependencies
         run: |
-          echo "Create postgresql database backup for ${githib.events.inputs.environ}"
+          echo "Create postgresql database backup for ${{ conStr }}"
+        env: 
+          conStr: '${{ inputs.environ }}'
 
