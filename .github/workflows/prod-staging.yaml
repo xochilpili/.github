@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Deploying to prod
         run: |
-          echo "Deploying to ${{ github.event.inputs.environ }}"
+          echo "Deploying to ${{ inputs.environ }}"
 
   staging-deploy:
     needs: backup
@@ -39,4 +39,4 @@ jobs:
       - uses: actions/checkout@v3
       - name: Deploying to staging
         run: |
-          echo "connection string: $ {{ github.event.inputs.environ }}"
+          echo "connection string: $ {{ inputs.environ }}"
